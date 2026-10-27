@@ -1519,10 +1519,15 @@ export const convertCircuitJsonToGerberCommands = (
                   element.soldermask_margin,
                 )
               }
-              const translatedPoints = points.map((point) => ({
-                x: point.x + element.x,
-                y: point.y + element.y,
-              }))
+              const ccwRotationRadians =
+                ((element.ccw_rotation ?? 0) * Math.PI) / 180
+              const padToPcbTransform = compose(
+                translate(element.x, element.y),
+                rotate(ccwRotationRadians),
+              )
+              const translatedPoints = points.map((point) =>
+                applyToPoint(padToPcbTransform, point),
+              )
               addClosedRegionFromPoints({
                 target: glayer,
                 apertureSource: glayer,
